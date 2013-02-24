@@ -185,6 +185,7 @@ static int panel_enable(struct msm_fb_data_type *mfd)
 static int panel_disable(struct msm_fb_data_type *mfd)
 {
 	struct dsi_buf *dsi_tx_buf;
+	static bool exec_once;
 
 	if (mot_panel == NULL) {
 		pr_err("%s: Invalid mot_panel\n", __func__);
@@ -193,8 +194,10 @@ static int panel_disable(struct msm_fb_data_type *mfd)
 
 	dsi_tx_buf =  mot_panel->mot_tx_buf;
 
-	mipi_dsi_cmds_tx(dsi_tx_buf, mot_display_off_cmds,
+	if (exec_once == false) {
+		mipi_dsi_cmds_tx(dsi_tx_buf, mot_display_off_cmds,
 					ARRAY_SIZE(mot_display_off_cmds));
+	}
 
 	return 0;
 }
@@ -267,7 +270,7 @@ out:
 	pinfo->lcd.v_back_porch = 2;
 	pinfo->lcd.v_front_porch = 2;
 	pinfo->lcd.v_pulse_width = 2;
-	pinfo->lcd.refx100 = 6000; /* adjust refx100 to prevent tearing */
+	pinfo->lcd.refx100 = 5800; /* adjust refx100 to prevent tearing */
 
 	pinfo->mipi.mode = DSI_CMD_MODE;
 	pinfo->mipi.dst_format = DSI_CMD_DST_FORMAT_RGB888;
